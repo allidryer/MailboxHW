@@ -50,8 +50,8 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate, UIGestureRe
         var velocity = gestureRecognizer.velocityInView(view)
         
         if gestureRecognizer.state == UIGestureRecognizerState.Began {
-            self.archiveIconImageView.alpha = 1
-            self.laterIconImageView.alpha = 1
+            self.archiveIconImageView.alpha = 0.3
+            self.laterIconImageView.alpha = 0.3
             UIView.animateWithDuration(0.3, delay: 0.2, options: nil, animations: {
                 self.laterIconImageView.alpha = 1
                 self.archiveIconImageView.alpha = 1
@@ -214,30 +214,55 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate, UIGestureRe
         // Dispose of any resources that can be recreated.
     }
     
-    func onEdgePan(panGestureRecognizer: UIPanGestureRecognizer) {
-        var point = panGestureRecognizer.locationInView(view)
-        var velocity = panGestureRecognizer.velocityInView(view)
+    @IBAction func onPanBigContainerView(panGestureRecognizer: UIPanGestureRecognizer) {
+        var location = panGestureRecognizer.locationInView(view)
         var translation = panGestureRecognizer.translationInView(view)
+        var velocity = panGestureRecognizer.velocityInView(view)
         
         if panGestureRecognizer.state == UIGestureRecognizerState.Began {
             imageCenter = bigContainerView.center
+//            if bigContainerView.frame.origin.x == 0 && translation.x < 0 {
+//            panGestureRecognizer.enabled = false
+//            } 
             
         } else if panGestureRecognizer.state == UIGestureRecognizerState.Changed {
-            bigContainerView.center.x = translation.x + imageCenter.x
+            
+            if translation.x > 0 {
+                bigContainerView.center.x = translation.x + imageCenter.x
+            } else if translation.x < 0 {
+                bigContainerView.center.x = translation.x + imageCenter.x
+            }
             
         } else if panGestureRecognizer.state == UIGestureRecognizerState.Ended {
-            if bigContainerView.center.x <= 160 {
-                UIView.animateWithDuration(0.5, delay: 0.0, options: nil, animations: {
-                    self.bigContainerView.center.x = 160
-                }, completion: nil)
-            } else if bigContainerView.center.x > 240 {
-                UIView.animateWithDuration(0.5, animations: {
-                    self.bigContainerView.transform = CGAffineTransformMakeTranslation(40, 0)
+            if translation.x > 160 {
+                UIView.animateWithDuration(0.3, animations: { () -> Void in
+                    self.bigContainerView.frame.origin.x = 290
+                    }, completion: nil)
+            } else if translation.x < 160 {
+                UIView.animateWithDuration(0.3, animations: { () -> Void in
+                    self.bigContainerView.frame.origin.x = 0
                 }, completion: nil)
             }
+            
+        }
+
+    }
+    
+    func onEdgePan(edgeGesture: UIScreenEdgePanGestureRecognizer) {
+        var location = edgeGesture.locationInView(view)
+        var translation = edgeGesture.translationInView(view)
+        var velocity = edgeGesture.velocityInView(view)
+        
+        if edgeGesture.state == UIGestureRecognizerState.Began {
+            imageCenter = bigContainerView.center
+            bigContainerView.center.x = translation.x + imageCenter.x
         }
     }
-
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer!, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer!) -> Bool {
+        return true
+    }
+    
     /*
     // MARK: - Navigation
 
