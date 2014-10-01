@@ -50,31 +50,27 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate, UIGestureRe
         var velocity = gestureRecognizer.velocityInView(view)
         
         if gestureRecognizer.state == UIGestureRecognizerState.Began {
-            self.archiveIconImageView.alpha = 0.3
-            self.laterIconImageView.alpha = 0.3
-            UIView.animateWithDuration(0.3, delay: 0.2, options: nil, animations: {
-                self.laterIconImageView.alpha = 1
-                self.archiveIconImageView.alpha = 1
-            }, completion: nil)
             imageCenter = messageImageView.center
             smallContainerView.backgroundColor = UIColor(red: 227/255, green: 227/255, blue: 227/255, alpha: 1)
             
         }  else if gestureRecognizer.state == UIGestureRecognizerState.Changed {
             laterIconImageView.image = UIImage(named: "later_icon.png")
             archiveIconImageView.image = UIImage(named: "archive_icon.png")
-            laterIconImageView.alpha = 0.3
-            archiveIconImageView.alpha = 0.3
             messageImageView.center.x = translation.x + imageCenter.x
             
                 // gray section
-                if messageImageView.center.x >= 100 && messageImageView.center.x < 160 {
-                    self.laterIconImageView.alpha = 1
-                    self.archiveIconImageView.alpha = 0
-                    smallContainerView.backgroundColor = UIColor(red: 227/255, green: 227/255, blue: 227/255, alpha: 1)
-                } else if messageImageView.center.x >= 160 && messageImageView.center.x < 220 {
-                    self.laterIconImageView.alpha = 0
-                    self.archiveIconImageView.alpha = 1
-                    smallContainerView.backgroundColor = UIColor(red: 227/255, green: 227/255, blue: 227/255, alpha: 1)
+            if messageImageView.center.x >= 100 && messageImageView.center.x < 160 {
+                //Alpha formula: abs(Position - minimum position)/ (max - min)
+                self.laterIconImageView.alpha = abs(messageImageView.center.x - 160)/60
+                self.archiveIconImageView.alpha = 0
+                smallContainerView.backgroundColor = UIColor(red: 227/255, green: 227/255, blue: 227/255, alpha: 1)
+                
+            } else if messageImageView.center.x >= 160 && messageImageView.center.x < 220 {
+                self.laterIconImageView.alpha = 0
+                //Alpha formula: (Position - minimum position)/ (max - min)
+                self.archiveIconImageView.alpha = (messageImageView.center.x-160)/60
+                smallContainerView.backgroundColor = UIColor(red: 227/255, green: 227/255, blue: 227/255, alpha: 1)
+
                 
                 // yellow or green section
                 } else if messageImageView.center.x < 100 && messageImageView.center.x > -100 {
@@ -106,16 +102,17 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate, UIGestureRe
         }  else if gestureRecognizer.state == UIGestureRecognizerState.Ended {
             //gray section
             if messageImageView.center.x >= 100 && messageImageView.center.x < 160 {
-                //Alpha formula: abs(Position - minimum position)/ (max - min)
-                self.laterIconImageView.alpha = abs(messageImageView.center.x - 160)/60
+                self.laterIconImageView.alpha = 1
                 self.archiveIconImageView.alpha = 0
-                smallContainerView.backgroundColor = UIColor(red: 227/255, green: 227/255, blue: 227/255, alpha: 1)
-                
+                UIView.animateWithDuration(0.2, animations: {
+                    self.messageImageView.center.x = 160
+                    }, completion: nil)
             } else if messageImageView.center.x >= 160 && messageImageView.center.x < 220 {
                 self.laterIconImageView.alpha = 0
-                //Alpha formula: (Position - minimum position)/ (max - min)
-                self.archiveIconImageView.alpha = (messageImageView.center.x-160)/60
-                smallContainerView.backgroundColor = UIColor(red: 227/255, green: 227/255, blue: 227/255, alpha: 1)
+                self.archiveIconImageView.alpha = 1
+                UIView.animateWithDuration(0.2, animations: {
+                    self.messageImageView.center.x = 160
+                    }, completion: nil)
                 
             //yellow section
             } else if messageImageView.center.x < 100 && messageImageView.center.x > -100 {
@@ -213,36 +210,6 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate, UIGestureRe
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func onPanBigContainerView(panGestureRecognizer: UIPanGestureRecognizer) {
-        var location = panGestureRecognizer.locationInView(view)
-        var translation = panGestureRecognizer.translationInView(view)
-        var velocity = panGestureRecognizer.velocityInView(view)
-        
-        if panGestureRecognizer.state == UIGestureRecognizerState.Began {
-            imageCenter = bigContainerView.center
-            
-        } else if panGestureRecognizer.state == UIGestureRecognizerState.Changed {
-            if translation.x > 0 {
-                bigContainerView.center.x = translation.x + imageCenter.x
-            } else if translation.x < 0 {
-                bigContainerView.center.x = translation.x + imageCenter.x
-            } else if bigContainerView.frame.origin.x == 0 {
-            
-        } else if panGestureRecognizer.state == UIGestureRecognizerState.Ended {
-            if translation.x > 160 {
-                UIView.animateWithDuration(0.3, animations: { () -> Void in
-                    self.bigContainerView.frame.origin.x = 290
-                    }, completion: nil)
-            } else if translation.x < 160 {
-                UIView.animateWithDuration(0.3, animations: { () -> Void in
-                    self.bigContainerView.frame.origin.x = 0
-                    }, completion: nil)
-                }
-            }
-        }
-    }
-    
-    
     
     func onEdgePan(edgeGesture: UIScreenEdgePanGestureRecognizer) {
         var location = edgeGesture.locationInView(view)
@@ -259,11 +226,10 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate, UIGestureRe
             } else if translation.x < 0 {
                 bigContainerView.center.x = translation.x + imageCenter.x
             }
-            
         } else if edgeGesture.state == UIGestureRecognizerState.Ended {
             if bigContainerView.center.x > 320 {
                 UIView.animateWithDuration(0.3, animations: { () -> Void in
-                    self.bigContainerView.frame.origin.x = 290
+                    self.bigContainerView.frame.origin.x = 280
                     }, completion: nil)
                 
             } else if bigContainerView.center.x < 320 {
@@ -278,6 +244,14 @@ class MailboxViewController: UIViewController, UIScrollViewDelegate, UIGestureRe
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer!, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer!) -> Bool {
         return true
+    }
+    
+    @IBAction func onTapBigViewContainer(sender: UITapGestureRecognizer) {
+        if bigContainerView.frame.origin.x == 280 {
+            UIView.animateWithDuration(0.3, animations: { () -> Void in
+               self.bigContainerView.center.x = 160
+            }, completion: nil)
+        }
     }
     
     /*

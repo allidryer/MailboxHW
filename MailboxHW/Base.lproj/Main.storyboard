@@ -79,7 +79,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <gestureRecognizers/>
                                 <connections>
-                                    <outletCollection property="gestureRecognizers" destination="qxG-Q3-Zaq" appends="YES" id="Jba-Mg-wua"/>
+                                    <outletCollection property="gestureRecognizers" destination="Gzz-hE-4CM" appends="YES" id="Svg-bh-HBK"/>
                                 </connections>
                             </view>
                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="reschedule" id="RGH-nO-zXC">
@@ -134,11 +134,11 @@
                         <action selector="onListTap:" destination="vXZ-lx-hvc" id="ceD-uv-yNS"/>
                     </connections>
                 </tapGestureRecognizer>
-                <panGestureRecognizer minimumNumberOfTouches="1" id="qxG-Q3-Zaq" userLabel="bigContainerView Pan Gesture Recognizer">
+                <tapGestureRecognizer id="Gzz-hE-4CM">
                     <connections>
-                        <action selector="onPanBigContainerView:" destination="vXZ-lx-hvc" id="NqX-hE-gcz"/>
+                        <action selector="onTapBigViewContainer:" destination="vXZ-lx-hvc" id="vfe-Eq-s8O"/>
                     </connections>
-                </panGestureRecognizer>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="233" y="336"/>
         </scene>
